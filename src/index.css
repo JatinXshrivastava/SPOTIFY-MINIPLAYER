@@ -1,0 +1,473 @@
+/* ===== CSS Reset & Variables ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --green: #1DB954;
+  --green-dim: #1aa34a;
+  --green-glow: rgba(29, 185, 84, 0.35);
+  --dark: #0a0a0a;
+  --darker: #050505;
+  --surface: rgba(18, 18, 18, 0.85);
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-hover: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.35);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: transparent;
+  user-select: none;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass); border-radius: 4px; }
+
+/* ===== App Container ===== */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+/* ===== Mini Player Card ===== */
+.player-card {
+  position: relative;
+  width: 370px;
+  height: 120px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(0, 0, 0, 0.3);
+  cursor: default;
+}
+
+/* ===== Background Album Art Blur ===== */
+.bg-blur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px) brightness(0.25) saturate(2);
+  transform: scale(1.15);
+  z-index: 0;
+  transition: background-image 0.8s ease;
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0,0,0,0.7) 0%,
+    rgba(0,0,0,0.4) 100%
+  );
+  z-index: 1;
+}
+
+/* ===== Drag Handle ===== */
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  z-index: 20;
+  cursor: grab;
+}
+.drag-handle:active { cursor: grabbing; }
+
+/* ===== Card Content ===== */
+.card-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 10px 14px;
+  height: 100%;
+}
+
+/* ===== Album Art ===== */
+.album-art-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.album-art {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  transition: transform var(--transition), box-shadow var(--transition);
+  display: block;
+}
+
+.album-art-wrapper:hover .album-art {
+  transform: scale(1.04);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.8), 0 0 20px var(--green-glow);
+}
+
+.album-art-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.album-art-wrapper:hover .album-art-overlay {
+  opacity: 1;
+}
+
+.open-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+.album-art-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+/* ===== Track Info ===== */
+.track-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.track-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.track-artist {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* ===== Controls ===== */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ctrl-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition), background var(--transition), transform 80ms ease;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ctrl-btn:hover {
+  color: var(--text-primary);
+  background: var(--glass);
+}
+
+.ctrl-btn:active {
+  transform: scale(0.9);
+}
+
+.ctrl-btn.play-pause {
+  background: var(--green);
+  color: #000;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 12px;
+  padding: 0;
+  box-shadow: 0 0 12px var(--green-glow);
+  transition: background var(--transition), transform 80ms ease, box-shadow var(--transition);
+}
+
+.ctrl-btn.play-pause:hover {
+  background: #1ed760;
+  box-shadow: 0 0 20px var(--green-glow);
+  color: #000;
+}
+
+.ctrl-btn.play-pause:active {
+  transform: scale(0.9);
+}
+
+/* ===== Right Side Actions ===== */
+.right-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.minimize-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition), background var(--transition);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.minimize-btn:hover {
+  color: var(--text-primary);
+  background: var(--glass);
+}
+
+.spotify-logo {
+  width: 14px;
+  height: 14px;
+  opacity: 0.4;
+  transition: opacity var(--transition);
+}
+
+.spotify-logo-wrapper:hover .spotify-logo {
+  opacity: 0.8;
+}
+
+/* ===== Progress Bar ===== */
+.progress-section {
+  padding: 0 14px 8px;
+  position: relative;
+  z-index: 10;
+}
+
+.progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width 1s linear;
+  box-shadow: 0 0 8px var(--green-glow);
+}
+
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ===== Not Playing State ===== */
+.not-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 6px;
+  padding: 14px;
+}
+
+.not-playing-icon {
+  font-size: 24px;
+  opacity: 0.4;
+}
+
+.not-playing-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ===== Login Screen ===== */
+.login-screen {
+  width: 370px;
+  height: 120px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  gap: 16px;
+}
+
+.login-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.login-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.login-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 50px;
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), transform 80ms ease, box-shadow var(--transition);
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 0 16px var(--green-glow);
+  flex-shrink: 0;
+}
+
+.login-btn:hover {
+  background: #1ed760;
+  box-shadow: 0 0 24px var(--green-glow);
+}
+
+.login-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== Spotify Click Flash ===== */
+@keyframes spotifyFlash {
+  0% { opacity: 0; }
+  30% { opacity: 0.15; }
+  100% { opacity: 0; }
+}
+
+.spotify-flash {
+  position: fixed;
+  inset: 0;
+  background: var(--green);
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: var(--radius);
+  animation: spotifyFlash 400ms ease forwards;
+}
+
+/* ===== Volume Slider ===== */
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 55px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+  outline: none;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  transition: transform var(--transition);
+}
+
+.volume-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
